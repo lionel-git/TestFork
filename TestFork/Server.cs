@@ -22,6 +22,9 @@ namespace TestFork
                 p.FileName = @"G:\my_projects\TestFork\TestFork\bin\Debug\TestFork.exe";
                 p.Arguments = "client_null";
                 p.UseShellExecute = false;
+                p.RedirectStandardOutput = true;
+                p.RedirectStandardError = true;
+                p.RedirectStandardInput = true;
                 _process = Process.Start(p);
 
                 File.AppendAllText(@"c:\tmp\start.log", $"OnStart child pid={_process.Id}\n");                
@@ -34,7 +37,9 @@ namespace TestFork
 
         public void OnStop()
         {
-            _process.Kill();
+            if (!_process.HasExited)
+                _process.Kill();
+
         }
     }
 }

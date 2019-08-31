@@ -23,7 +23,7 @@ namespace TestFork
                 var p = new ProcessStartInfo();
                 p.FileName = "TestFork.exe";
                 p.Arguments = "client";
-                p.UseShellExecute = false;               
+                p.UseShellExecute = false;                
                 var process = Process.Start(p);
                 processes.Add(process);
                 Console.WriteLine($"Started pid={process.Id}");
@@ -48,6 +48,8 @@ namespace TestFork
             int pid = Process.GetCurrentProcess().Id;
             string log = $@"c:\tmp\child_{pid}.log";
             File.AppendAllText(log, $"From Client pid = {pid}\n");
+
+            Console.WriteLine($"From Client with pid={pid}");
 
             var procs = Process.GetProcesses();
             foreach (var proc in procs)
@@ -151,6 +153,7 @@ namespace TestFork
         }
         static void ClientNull()
         {
+            //Console.WriteLine($"From client null pid={Process.GetCurrentProcess().Id}");
             Thread.Sleep(100_000);
         }
 
