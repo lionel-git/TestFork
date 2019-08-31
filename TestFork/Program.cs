@@ -23,8 +23,7 @@ namespace TestFork
                 var p = new ProcessStartInfo();
                 p.FileName = "TestFork.exe";
                 p.Arguments = "client";
-                p.UseShellExecute = false;
-                p.CreateNoWindow = true;
+                p.UseShellExecute = false;               
                 var process = Process.Start(p);
                 processes.Add(process);
                 Console.WriteLine($"Started pid={process.Id}");
@@ -61,7 +60,7 @@ namespace TestFork
                     if (parentP.Id == pid)
                     {
                         File.AppendAllText(log, $"Child pid = {proc.Id} {proc.ProcessName}\n");
-                        proc.Kill();
+                      //  proc.Kill();
                     }
                 }
                 catch (Exception)
