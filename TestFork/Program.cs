@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Net;
 using ServiceUtils;
+using System.Collections.Concurrent;
 
 namespace TestFork
 {
@@ -157,10 +158,54 @@ namespace TestFork
             Thread.Sleep(100_000);
         }
 
+
+        static void TestAdd(BlockingCollection<int> c)
+        {
+            Thread.Sleep(2000);
+            c.Add(17);
+            Thread.Sleep(2000);
+            c.CompleteAdding();
+        }
+
+        static void TestBlockingColl()
+        {
+            var c = new BlockingCollection<int>();
+            try
+            {
+                c.Add(1);
+                c.Add(2);
+
+                var v1 = c.Take();
+                Console.WriteLine(v1);
+                var v2 = c.Take();
+                Console.WriteLine(v2);
+
+                Task.Run(() => TestAdd(c));
+
+                var v3 = c.Take();
+                Console.WriteLine(v3);
+
+                var v4 = c.Take();
+                Console.WriteLine(v4);
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine("Queue completed");
+            }
+        }
+
+
+
+
+
+
+
         static void Main(string[] args)
         {
             try
-            {               
+            {
+
+                TestBlockingColl(); return;
                 //TestLocalAny(); return;
 
                 /* int port = FreeTcpPort();
