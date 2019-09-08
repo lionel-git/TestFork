@@ -10,11 +10,14 @@ using System.Net.Sockets;
 using System.Net;
 using ServiceUtils;
 using System.Collections.Concurrent;
+using log4net;
 
 namespace TestFork
 {
     class Program
     {
+        private static readonly ILog Logger = LogManager.GetLogger("Program");
+
         static void Server()
         {
             Console.WriteLine($"From Server pid = {Process.GetCurrentProcess().Id}");
@@ -194,7 +197,27 @@ namespace TestFork
             }
         }
 
+        static void TestLogPerf()
+        {
+            var sw = new Stopwatch();
+            double elapsed;
 
+            Logger.Info($"Init");
+
+            double total = 0.0;
+            int N = 100;
+            for (int i = 0; i < N; i++)
+            {
+                sw.Restart();
+                Logger.Info($"Test_{i}");
+                elapsed = sw.ElapsedTicks * 0.1;
+                total += elapsed;
+                Console.WriteLine($"{elapsed} us");
+            }
+            Console.WriteLine($"Moy: {total/N}");
+
+
+        }
 
 
 
@@ -204,6 +227,7 @@ namespace TestFork
         {
             try
             {
+                TestLogPerf(); return;
 
                 TestBlockingColl(); return;
                 //TestLocalAny(); return;
