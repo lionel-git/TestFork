@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Net;
 using ServiceUtils;
 using System.Collections.Concurrent;
+using System.ServiceProcess;
 
 namespace TestFork
 {
@@ -30,6 +31,9 @@ namespace TestFork
                 Console.WriteLine($"Started pid={process.Id}");
                 Thread.Sleep(500);
             }
+
+            Console.WriteLine("Test Exit");
+            Environment.Exit(0);
 
             int count = 0;
             do
@@ -87,7 +91,10 @@ namespace TestFork
 
 
             var pProcess = ParentProcessUtilities.GetParentProcess(Process.GetCurrentProcess().Handle);
-            File.AppendAllText(log, $"Parent pid = {pProcess.Id}\n");
+            if (pProcess!=null)
+                File.AppendAllText(log, $"Parent pid = {pProcess.Id}\n");
+            else
+                File.AppendAllText(log, $"Parent pid NOT FOUND\n");
 
             File.AppendAllText(log, $"Exiting pid = {pid}\n");
         }
@@ -194,7 +201,31 @@ namespace TestFork
             }
         }
 
+        static void TestStartService()
+        {
+            
+            string serviceName = "CheckDisk";
+            var service = new ServiceController(serviceName);
 
+            service.Refresh();
+            Console.WriteLine(service.Status);
+            Console.WriteLine(service.MachineName);
+            Console.WriteLine(service.ServiceType);
+            Console.WriteLine(service.Site);
+            Console.WriteLine(service.StartType);
+            
+            service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, new TimeSpan(0, 0, 30));
+            service.Refresh();
+            Console.WriteLine(service.Status);
+
+            Thread.Sleep(5000);
+
+            service.Stop();
+            service.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 30));
+            service.Refresh();
+            Console.WriteLine(service.Status);
+        }
 
 
 
@@ -204,8 +235,9 @@ namespace TestFork
         {
             try
             {
+                TestStartService(); return;
 
-                TestBlockingColl(); return;
+               // TestBlockingColl(); return;
                 //TestLocalAny(); return;
 
                 /* int port = FreeTcpPort();
