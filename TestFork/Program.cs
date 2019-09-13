@@ -11,11 +11,14 @@ using System.Net;
 using ServiceUtils;
 using System.Collections.Concurrent;
 using System.ServiceProcess;
+using log4net;
 
 namespace TestFork
 {
     class Program
     {
+        private static readonly ILog Logger = LogManager.GetLogger("Program");
+
         static void Server()
         {
             Console.WriteLine($"From Server pid = {Process.GetCurrentProcess().Id}");
@@ -195,11 +198,12 @@ namespace TestFork
                 var v4 = c.Take();
                 Console.WriteLine(v4);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 Console.WriteLine("Queue completed");
             }
         }
+
 
         static void TestStartService()
         {
@@ -227,6 +231,26 @@ namespace TestFork
             Console.WriteLine(service.Status);
         }
 
+        static void TestLogPerf()
+        {
+            var sw = new Stopwatch();
+            double elapsed;
+
+            Logger.Info($"Init");
+
+            double total = 0.0;
+            int N = 100;
+            for (int i = 0; i < N; i++)
+            {
+                sw.Restart();
+                Logger.Info($"Test_{i}");
+                elapsed = sw.ElapsedTicks * 0.1;
+                total += elapsed;
+                Console.WriteLine($"{elapsed} us");
+            }
+            Console.WriteLine($"Moy: {total/N}");
+        }
+
 
 
 
@@ -236,6 +260,7 @@ namespace TestFork
             try
             {
                 TestStartService(); return;
+//                TestLogPerf(); return;
 
                // TestBlockingColl(); return;
                 //TestLocalAny(); return;
